@@ -16,12 +16,39 @@ class Capillary_Enclosure(Basic_Enclosure):
         self.make_rubber_band_notch()
         self.make_backlight_standoffs()
         self.make_led_plate()
+        self.make_diffuser_plate()
 
     def get_assembly(self,**kwargs):
         parts_list = super(Capillary_Enclosure,self).get_assembly(**kwargs)
 
+        # Add led plate
+        x,y,z = self.params['inner_dimensions']
+        led_standoff_length = self.params['led_standoff_length']
         led_plate = self.led_plate
+        z_shift = 0.5*z - led_standoff_length 
+        led_plate = Translate(led_plate,v=(0,0,z_shift))
         parts_list.append(led_plate)
+
+        # Add diffuser plate
+        diffuser_standoff_length = self.params['diffuser_standoff_length']
+        diffuser_plate = self.diffuser_plate
+        z_shift = 0.5*z - led_standoff_length - diffuser_standoff_length
+        diffuser_plate = Translate(diffuser_plate, v=(0,0,z_shift))
+        parts_list.append(diffuser_plate)
+
+        return parts_list
+
+    def get_projection(self,**kwargs):
+        parts_list = super(Capillary_Enclosure,self).get_projection(**kwargs)
+
+        wall_thickness = self.params['wall_thickness']
+        spacing = kwargs['spacing_factor']*wall_thickness
+        
+        # Add led plate
+        led_plate = self.led_plate
+        led_plate = Projection(led_plate)
+        parts_list.append(led_plate)
+
         return parts_list
 
     def add_capillary_holes(self):
@@ -174,6 +201,8 @@ class Capillary_Enclosure(Basic_Enclosure):
         plate_x, plate_y = self.params['led_plate_xy']
         hole_diam = self.params['standoff_hole_diameter']
         sensor_length = self.params['sensor_length']
+        led_num = self.params['led_num']
+        led_slot_x, led_slot_y = self.params['led_slot_xy']
 
         self.led_plate = Cube(size=(plate_x,plate_y,wall_thickness))
 
@@ -189,17 +218,37 @@ class Capillary_Enclosure(Basic_Enclosure):
             hole_list.append(hole)
 
         # Add led holes
+        x_pos_array = scipy.linspace(-0.5*sensor_length + 1.0, 0.5*sensor_length -1.0, led_num)
+        for x_pos in x_pos_array:
+            y_pos = 0.0
+            hole = {
+                    'panel'    : 'led_plate',
+                    'type'     : 'rounded_square',
+                    'location' : (x_pos, y_pos),
+                    'size'     : (led_slot_x, led_slot_y, 0.5*led_slot_y),
+                    }
+            hole_list.append(hole)
         
-
         self.add_holes(hole_list)
 
+    def make_diffuser_plate(self):
+        wall_thickness = self.params['wall_thickness']
+        plate_x, plate_y = self.params['diffuser_plate_xy']
+        hole_diam = self.params['standoff_hole_diameter']
 
+        self.diffuser_plate = Cube(size=(plate_x,plate_y,wall_thickness))
 
-
-
-
-
-        
+        # Add standoff holes
+        hole_list = []
+        for x_pos, y_pos in self.backlight_standoff_xy:
+            hole = {
+                    'panel'    : 'diffuser_plate',
+                    'type'     : 'round',
+                    'location' : (x_pos, y_pos),
+                    'size'     : hole_diam,
+                    }
+            hole_list.append(hole)
+        self.add_holes(hole_list)
 
 
 

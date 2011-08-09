@@ -36,17 +36,22 @@ params = {
         'rubber_band_notch_width'  : 2.0, 
         'led_plate_xy'             : (x-3.0,y-17.0),
         'led_slot_xy'              : (3.02,1.5), 
-        'led_num'                  : 6, 
+        'led_num'                  : 10, 
         'sensor_length'            : 48.0,
+        'led_standoff_length'      : (3.0/8.0)*INCH2MM,
+        'diffuser_standoff_length' : (3.0/8.0)*INCH2MM,
+        'diffuser_plate_xy'        : (x-3.0,y-17.0),
         }
 
 enclosure = Capillary_Enclosure(params)
 enclosure.make()
 
 part_assembly = enclosure.get_assembly(
-        show_top=False,
-        show_bottom=False, 
-        explode=(0,0,0)
+        show_top=True,
+        show_bottom=True, 
+        show_front=False,
+        show_back=False,
+        explode=(10,10,10)
         )
 
 part_projection = enclosure.get_projection()
