@@ -61,16 +61,20 @@ enclosure.make()
 part_assembly = enclosure.get_assembly(
         show_top=True,
         show_bottom=True, 
-        show_front=False,
-        show_back=False,
-        show_left=False,
-        show_right=False,
+        show_front=True,
+        show_back=True,
+        show_left=True,
+        show_right=True,
         show_led_plate=True,
         show_diffuser_plate=True,
         show_standoffs=True,
         show_led_standoffs=True,
         show_diffuser_standoffs=True,
-        explode=(0,0,0),
+        show_capillary=False,
+        show_sensor=True,
+        show_clamp_plates=True,
+        show_clamp_standoffs=True,
+        explode=(8,8,8),
         )
 
 

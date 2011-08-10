@@ -96,6 +96,7 @@ class Capillary_Enclosure(Basic_Enclosure):
         sensor = self.sensor
         z_shift = -0.5*z+0.5*sensor_z - explode_z
         sensor = Translate(sensor,v=(0,0,z_shift))
+        sensor = Color(sensor,rgba=(0.5,0.5,0.5))
         if show_sensor:
             parts_list.append(sensor)
 
