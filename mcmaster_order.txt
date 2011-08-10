@@ -1,0 +1,7 @@
+1   6  Each  93505A101   Aluminum Male-Female Threaded Hex Standoff 3/16" Hex, 1/4" Length, 4-40 Screw Size (Same as 93505A855) 
+2   6  Each  91780A162   Aluminum Female Threaded Hex Standoff 1/4" Hex, 1/4" Length, 4-40 Screw Size (Same as 91780A720)       
+3   10 Each  91780A169   Aluminum Female Threaded Hex Standoff 1/4" Hex, 1-1/4" Length, 4-40 Screw Size (Same as 91780A760)     
+4   10 Each  92510A030   Aluminum Unthreaded Spacer 1/4" OD, 5/32" Length, #4 Screw Size (Same as 92510A115)                    
+5   1  Pack  90272A105   Zinc-Pltd STL Pan Head Phillips Machine Screw 4-40 Thread, 3/16" Length, Packs of 100                  
+6   1  Pack  47025A81    Aluminum Oxide Sandpaper Sheet 320 Grit, A-Weight, 9" X 11", 15/Package, Packs of 15                   
+7   1  Pack  6835A36     Waterproof Aluminum Oxide Sandpaper Sheet 400 Grit, B-Weight, 9" X 11", 15/Package, Packs of 15        
