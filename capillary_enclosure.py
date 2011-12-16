@@ -6,11 +6,11 @@ class Capillary_Enclosure(Basic_Enclosure):
 
     def __init__(self,params):
         self.params = params
-        self.add_sensor_mount_holes()
-        self.add_sensor_cable_hole()
+        self.add_sensor_cutout()
+        #self.add_sensor_cable_hole()
         self.add_capillary_holes()
-        self.add_capillary_clamp_holes()
-        self.add_led_cable_hole()
+        #self.add_capillary_clamp_holes()
+        #self.add_led_cable_hole()
         super(Capillary_Enclosure,self).__init__(self.params)
 
     def make(self):
@@ -20,11 +20,12 @@ class Capillary_Enclosure(Basic_Enclosure):
         self.make_led_plate()
         self.make_diffuser_plate()
         self.make_sensor()
-        self.make_clamp_standoffs()
+        #self.make_clamp_standoffs()
         self.make_clamp_plates()
         self.make_led_standoffs()
         self.make_diffuser_standoffs()
         self.make_capillary()
+        self.make_guide_plates()
 
     def get_assembly(self,**kwargs):
         """
@@ -63,6 +64,10 @@ class Capillary_Enclosure(Basic_Enclosure):
         except KeyError:
             show_capillary = True
         try:
+            show_guide_plate = kwargs['show_guide_plate']
+        except KeyError:
+            show_guide_plate = True
+        try:
             explode = kwargs['explode']
         except KeyError:
             explode = (0,0,0)
@@ -94,30 +99,12 @@ class Capillary_Enclosure(Basic_Enclosure):
         # Add sensor
         sensor_x, sensor_y, sensor_z = self.params['sensor_dimensions']
         sensor = self.sensor
-        z_shift = -0.5*z+0.5*sensor_z - explode_z
+        z_shift = -0.5*z-0.5*sensor_z - explode_z
         sensor = Translate(sensor,v=(0,0,z_shift))
         sensor = Color(sensor,rgba=(0.5,0.5,0.5))
         if show_sensor:
             parts_list.append(sensor)
 
-        # Add clamp standoffs
-        clamp_standoff_length = self.params['capillary_clamp_standoff_length']
-        z_shift = -0.5*z+0.5*clamp_standoff_length - explode_z
-        for standoff in self.clamp_standoff_list:
-            standoff = Translate(standoff,v=(0,0,z_shift))
-            if show_clamp_standoffs:
-                parts_list.append(standoff)
-
-        # Add clamp plates
-        plate_x, plate_y, plate_z = self.params['capillary_clamp_plate_dimensions']
-        hole_space = self.params['sensor_mount_hole_space']
-        for clamp_plate, sgn in zip(self.clamp_plate_list,(-1,1)):
-            x_shift = 0.5*sgn*hole_space
-            y_shift = 0
-            z_shift = -0.5*z + 0.5*plate_z + clamp_standoff_length - explode_z
-            clamp_plate = Translate(clamp_plate,v=(x_shift,y_shift,z_shift))
-            if show_clamp_plates:
-                parts_list.append(clamp_plate)
 
         # Add led standoffs
         led_standoff_length = self.params['led_standoff_length']
@@ -139,7 +126,7 @@ class Capillary_Enclosure(Basic_Enclosure):
 
         # Add capillary
         cap_offset_x, cap_offset_y = self.params['capillary_hole_offset']
-        cap_hole_diam = self.params['capillary_hole_diam']
+        cap_hole_diam = self.params['capillary_diam']
         y_shift = cap_offset_x
         z_shift = -0.5*z + 0.5*cap_hole_diam + cap_offset_y - explode_z
         capillary = self.capillary
@@ -147,6 +134,20 @@ class Capillary_Enclosure(Basic_Enclosure):
         if show_capillary:
             parts_list.append(capillary)
         
+        # Add guide plate
+        guide_x, guide_y, guide_z = self.params['guide_plate_dimensions']
+        y_shift = 0.5*guide_y + 0.5*self.params['capillary_diam'] + cap_offset_x
+        z_shift = -0.5*z + 0.5*guide_z
+        guide_plate_pos = Translate(self.guide_plate_pos,v=[0,y_shift,z_shift])
+        y_shift = -0.5*guide_y - 0.5*self.params['capillary_diam'] + cap_offset_x
+        guide_plate_neg = Translate(self.guide_plate_neg,v=[0,y_shift,z_shift])
+        y_shift = cap_offset_x
+        z_shift = -0.5*z + 1.5*guide_z 
+        guide_plate_top = Translate(self.guide_plate_top,v=[0,y_shift,z_shift])
+
+        if show_guide_plate:
+           parts_list.extend([guide_plate_pos,guide_plate_neg,guide_plate_top])
+
         return parts_list
 
     def get_opaque_projection(self,show_ref_cube=True, spacing_factor=4):
@@ -230,23 +231,29 @@ class Capillary_Enclosure(Basic_Enclosure):
             hole_list.append(hole)
         self.params['hole_list'].extend(hole_list)
 
-    def add_sensor_mount_holes(self):
+ 
+    def add_sensor_cutout(self):
         """
-        Add mount holes for sensor
+        Add cutout for sensor
         """
         hole_list = [] 
-        hole_diam = self.params['sensor_mount_hole_diam']
-        hole_space = self.params['sensor_mount_hole_space']
-        for i in (-1,1):
-            x_pos, y_pos = i*0.5*hole_space, 0.0
-            hole = {
+
+        sensor_width = self.params['sensor_width']
+        sensor_length = self.params['sensor_length']
+        hole_offset = self.params['sensor_hole_offset']
+        
+        x_pos = 0;
+        y_pos = -hole_offset;
+            
+        hole = {
                     'panel'    : 'bottom', 
-                    'type'     : 'round', 
+                    'type'     : 'square', 
                     'location' : (x_pos, y_pos),
-                    'size'     : hole_diam,
+                    'size'     : (sensor_length, sensor_width),
                     }
-            hole_list.append(hole)
+        hole_list.append(hole)
         self.params['hole_list'].extend(hole_list)
+
 
     def add_capillary_clamp_holes(self):
         """
@@ -539,12 +546,21 @@ class Capillary_Enclosure(Basic_Enclosure):
             self.diffuser_standoff_list.append(standoff)
 
     def make_capillary(self):
-        diameter = self.params['capillary_hole_diam']
+        diameter = self.params['capillary_diam']
         length = self.params['capillary_length']
         r = 0.5*diameter
         capillary = Cylinder(h=length,r1=r,r2=r)
         capillary = Rotate(capillary, a=90, v=(0,1,0))
         self.capillary = capillary
 
+
+    def make_guide_plates(self):
+        guide_x, guide_y, guide_z = self.params['guide_plate_dimensions']
+        self.guide_plate_pos = Cube(size=(guide_x, guide_y, guide_z))
+        self.guide_plate_neg = Cube(size=(guide_x, guide_y, guide_z))
+        top_x = guide_x
+        top_y = 2*guide_y + self.params['capillary_diam']
+        top_z = guide_z
+        self.guide_plate_top = Cube(size=(top_x,top_y,top_z))
 
 

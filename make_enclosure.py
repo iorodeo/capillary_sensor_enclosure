@@ -7,16 +7,16 @@ from capillary_enclosure import Capillary_Enclosure
 INCH2MM = 25.4
 
 # Inside dimensions
-x,y,z = 70.0, 45.0, 1.25*INCH2MM 
+x,y,z = 61.25, 45.0, 0.75*INCH2MM 
 hole_list = []
 
 params = {
         'inner_dimensions'                 : (x,y,z), 
-        'wall_thickness'                   : 1.5, 
-        'lid_radius'                       : 3.0,  
-        'top_x_overhang'                   : 3.0,
-        'top_y_overhang'                   : 3.0,
-        'bottom_x_overhang'                : 3.0,
+        'wall_thickness'                   : 3.0, 
+        'lid_radius'                       : 1.5,  
+        'top_x_overhang'                   : 1.0,
+        'top_y_overhang'                   : 1.0,
+        'bottom_x_overhang'                : 8.0,
         'bottom_y_overhang'                : 3.0, 
         'lid2front_tabs'                   : (0.25,0.75),
         'lid2side_tabs'                    : (0.25, 0.75),
@@ -24,12 +24,13 @@ params = {
         'lid2front_tab_width'              : 7.0,
         'lid2side_tab_width'               : 7.0, 
         'side2side_tab_width'              : 7.0,
-        'standoff_diameter'                : 0.25*INCH2MM,
+        'standoff_diameter'                : 0.1895*INCH2MM,
         'standoff_offset'                  : 0.05*INCH2MM,
-        'standoff_hole_diameter'           : 0.116*INCH2MM, 
+        'standoff_hole_diameter'           : 0.089*INCH2MM, 
+        'capillary_diam'                   : 1.0,
         'capillary_hole_diam'              : 0.85,  
-        'capillary_hole_offset'            : (0.25,3.32),
-        'capillary_length'                 : 125.0,
+        'capillary_hole_offset'            : (0.25,0),
+        'capillary_length'                 : 5*INCH2MM,
         'rubber_band_notch_width'          : 2.0, 
         'led_plate_xy'                     : (x-3.0,y-17.0),
         'led_slot_xy'                      : (3.02,1.5), 
@@ -37,7 +38,8 @@ params = {
         'led_standoff_length'              : (1.0/4.0)*INCH2MM,
         'led_num'                          : 10, 
         'led_cable_hole_width'             : 3.0,
-        'sensor_length'                    : 48.0,
+        'sensor_width'                     : 12.95,
+        'sensor_length'                    : 61.33,
         'diffuser_standoff_length'         : (1.0/4.0)*INCH2MM,
         'diffuser_standoff_diam'           : 0.25*INCH2MM,
         'diffuser_plate_xy'                : (x-3.0,y-17.0),
@@ -52,6 +54,7 @@ params = {
         'capillary_clamp_standoff_length'  : (5.0/32.0)*INCH2MM,
         'capillary_clamp_plate_dimensions' : (6.35,28.35,1.5),
         'hole_list'                        : hole_list,
+        'guide_plate_dimensions'           : (x-0.2, 0.5*INCH2MM, 0.0625*INCH2MM),
         }
 
 
@@ -65,16 +68,17 @@ part_assembly = enclosure.get_assembly(
         show_back=True,
         show_left=True,
         show_right=True,
-        show_led_plate=True,
-        show_diffuser_plate=True,
+        show_led_plate=False,
+        show_diffuser_plate=False,
         show_standoffs=True,
-        show_led_standoffs=True,
-        show_diffuser_standoffs=True,
-        show_capillary=False,
+        show_led_standoffs=False,
+        show_diffuser_standoffs=False,
+        show_capillary=True,
         show_sensor=True,
-        show_clamp_plates=True,
-        show_clamp_standoffs=True,
-        explode=(8,8,8),
+        show_clamp_plates=False,
+        show_clamp_standoffs=False,
+        show_guide_plate=True,
+        explode=(0,0,0),
         )
 
 
