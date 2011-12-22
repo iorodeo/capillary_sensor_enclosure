@@ -28,8 +28,8 @@ params = {
         'standoff_offset'                  : 0.05*INCH2MM,
         'standoff_hole_diameter'           : 0.089*INCH2MM, 
         'capillary_diam'                   : 1.0,
-        'capillary_hole_diam'              : 0.85,  
-        'capillary_hole_offset'            : (0.25,0),
+        'capillary_hole_size'              : (1.1,1.1,0.1),  
+        'capillary_hole_offset'            : 0.25,
         'capillary_length'                 : 5*INCH2MM,
         'sensor_width'                     : 12.95,
         'sensor_length'                    : 61.33,
@@ -41,6 +41,8 @@ params = {
         'led_pcb_thru_hole_diam'           : 0.0890*INCH2MM,
         'led_pcb_tap_hole_diam'            : 0.0641*INCH2MM,
         'led_pcb_hole_offset'              : 0.15*INCH2MM,
+        'led_cable_hole_size'              : (6.0,4.0),
+        'led_cable_hole_pos'               : (0.0, 0.7*INCH2MM),
         'diffuser_dimensions'              : (61.0 ,25.4, 1.5),
         'diffuser_standoff_height'         : (7/32.0)*INCH2MM,
         'diffuser_standoff_diam'           : (3/16.0)*INCH2MM,
@@ -56,9 +58,9 @@ enclosure = Capillary_Enclosure(params)
 enclosure.make()
 
 part_assembly = enclosure.get_assembly(
-        show_top=True,
-        show_bottom=True, 
-        show_front=True,
+        show_top=False,
+        show_bottom=False, 
+        show_front=False,
         show_back=False,
         show_left=False,
         show_right=False,
@@ -72,19 +74,33 @@ part_assembly = enclosure.get_assembly(
         )
 
 
-opaque_part_projection = enclosure.get_opaque_projection()
+box_projection = enclosure.get_box_projection()
+diffuser_projection = enclosure.get_diffuser_projection()
+top_guide_projection = enclosure.get_guide_top_projection()
+side_guide_projection = enclosure.get_guide_side_projection()
 
 prog_assembly = SCAD_Prog()
 prog_assembly.fn = 50
 prog_assembly.add(part_assembly)
 prog_assembly.write('enclosure_assembly.scad')
 
-#prog_opaque_projection = SCAD_Prog()
-#prog_opaque_projection.fn = 50
-#prog_opaque_projection.add(opaque_part_projection)
-#prog_opaque_projection.write('enclosure_opaque_projection.scad')
-#
-#prog_diffuser_projection = SCAD_Prog()
-#prog_diffuser_projection.fn = 50
-#prog_diffuser_projection.add(diffuser_projection)
-#prog_diffuser_projection.write('enclosure_diffuser_projection.scad')
+prog_box_projection = SCAD_Prog()
+prog_box_projection.fn = 50
+prog_box_projection.add(box_projection)
+prog_box_projection.write('box_projection.scad')
+
+prog_diffuser_projection = SCAD_Prog()
+prog_diffuser_projection.fn = 50
+prog_diffuser_projection.add(diffuser_projection)
+prog_diffuser_projection.write('diffuser_projection.scad')
+
+prog_top_guide_projection = SCAD_Prog()
+prog_top_guide_projection.fn = 50
+prog_top_guide_projection.add(top_guide_projection)
+prog_top_guide_projection.write('top_guide_projection.scad')
+
+prog_side_guide_projection = SCAD_Prog()
+prog_side_guide_projection.fn = 50
+prog_side_guide_projection.add(side_guide_projection)
+prog_side_guide_projection.write('side_guide_projection.scad')
+

@@ -10,6 +10,7 @@ class Capillary_Enclosure(Basic_Enclosure):
         self.add_capillary_holes()
         self.add_guide_tap_holes()
         self.add_led_tap_holes()
+        self.add_led_cable_hole()
         super(Capillary_Enclosure,self).__init__(self.params)
 
     def make(self):
@@ -70,10 +71,10 @@ class Capillary_Enclosure(Basic_Enclosure):
             parts_list.append(sensor)
 
         # Add capillary
-        cap_offset_x, cap_offset_y = self.params['capillary_hole_offset']
+        cap_offset_x = self.params['capillary_hole_offset']
         cap_hole_diam = self.params['capillary_diam']
         y_shift = cap_offset_x
-        z_shift = -0.5*z + 0.5*cap_hole_diam + cap_offset_y - explode_z
+        z_shift = -0.5*z + 0.5*cap_hole_diam  - explode_z
         capillary = self.capillary
         capillary = Translate(self.capillary,v=(0,y_shift,z_shift))
         if show_capillary:
@@ -122,38 +123,106 @@ class Capillary_Enclosure(Basic_Enclosure):
         return parts_list
 
 
-    def get_opaque_projection(self,show_ref_cube=True, spacing_factor=4):
+    def get_box_projection(self,show_ref_cube=True, spacing_factor=4):
         """
         Get 2D projected layout of parts for laser cutting.
         """
         parts_list = super(Capillary_Enclosure,self).get_projection(show_ref_cube,spacing_factor)
+        return parts_list
 
-        x,y,z = self.params['inner_dimensions']
-        wall_thickness = self.params['wall_thickness']
-        spacing = spacing_factor*wall_thickness
+
+    def get_guide_side_projection(self,show_ref_cube=True,spacing_factor=2):
+        """
+        Get 2D projected layout of the two side guide plates for laser cutting.
+        """
+        parts_list = []
+        guide_x, guide_y, guide_z = self.params['guide_plate_dimensions']
+        thickness = self.params['wall_thickness']
+
+        # Add the side guide plates
+        y_shift = 0.5*guide_y + 0.5*spacing_factor*thickness
+        guide_plate_pos = Translate(self.guide_plate_pos,v=(0,y_shift,0))
+        guide_plate_pos = Projection(guide_plate_pos)
+        parts_list.append(guide_plate_pos)
+
+        guide_plate_neg = Translate(self.guide_plate_neg,v=(0,-y_shift,0))
+        guide_plate_neg = Projection(guide_plate_neg)
+        parts_list.append(guide_plate_neg)
+
+        # Add reference cube
+        ref_cube = Cube(size=(INCH2MM, INCH2MM, INCH2MM))   
+        x_shift = 0.5*guide_x + 0.5*INCH2MM + spacing_factor*thickness
+        ref_cube = Translate(ref_cube,v=(x_shift,0,0))
+        ref_cube = Projection(ref_cube)
+        if show_ref_cube:
+            parts_list.append(ref_cube)
 
         return parts_list
 
 
+    def get_guide_top_projection(self,show_ref_cube=True,spacing_factor=2):
+        """
+        Get 2D projected layout of the top guide plate for laser cutting.
+        """
+        parts_list = []
+        top_x, top_y, top_z = self.get_guide_plate_top_dim()
+        thickness = self.params['wall_thickness']
+
+        # Add top guide plate
+        guide_plate_top = Projection(self.guide_plate_top)
+        parts_list.append(guide_plate_top)
+
+        # Add reference cube
+        ref_cube = Cube(size=(INCH2MM, INCH2MM, INCH2MM))   
+        x_shift = 0.5*top_x + 0.5*INCH2MM + spacing_factor*thickness
+        ref_cube = Translate(ref_cube,v=(x_shift,0,0))
+        ref_cube = Projection(ref_cube)
+        if show_ref_cube:
+            parts_list.append(ref_cube)
+
+        return parts_list
+        
+
+    def get_diffuser_projection(self,show_ref_cube=True,spacing_factor=2):
+        """
+        Get 2D projected layout of the diffuser for laser cutting.
+        """
+        parts_list = []
+        diff_x, diff_y, diff_z = self.params['diffuser_dimensions']
+        thickness = self.params['wall_thickness']
+        
+        # Add diffuser
+        diffuser = Projection(self.diffuser)
+        parts_list.append(diffuser)
+
+        # Add reference cube
+        ref_cube = Cube(size=(INCH2MM, INCH2MM, INCH2MM))   
+        x_shift = 0.5*diff_x + 0.5*INCH2MM + spacing_factor*thickness
+        ref_cube = Translate(ref_cube,v=(x_shift,0,0))
+        ref_cube = Projection(ref_cube)
+        if show_ref_cube:
+            parts_list.append(ref_cube)
+        return parts_list
 
 
     def add_capillary_holes(self):
         """
         Add holes for capillary positioning
         """
-        hole_list = [] 
-        hole_diam = self.params['capillary_hole_diam']
-        hole_offset_x, hole_offset_y = self.params['capillary_hole_offset']
+        hole_x, hole_y, hole_r = self.params['capillary_hole_size']
+        hole_y = 2*hole_y
+        hole_offset_x =  self.params['capillary_hole_offset']
         x,y,z = self.params['inner_dimensions']
         panel_list= ('left', 'right')
+        hole_list = [] 
         for panel in panel_list:
-            x_pos = hole_offset_x
-            y_pos = -0.5*z + 0.5*hole_diam + hole_offset_y
+            pos_x = hole_offset_x
+            pos_y = -0.5*z 
             hole = {
                     'panel'    : panel,
-                    'type'     : 'round',
-                    'location' : (x_pos, y_pos),
-                    'size'     : hole_diam,
+                    'type'     : 'rounded_square',
+                    'location' : (pos_x, pos_y),
+                    'size'     : (hole_x, hole_y, hole_r),
                     }
             hole_list.append(hole)
         self.params['hole_list'].extend(hole_list)
@@ -445,6 +514,17 @@ class Capillary_Enclosure(Basic_Enclosure):
         radius = 0.5*diam
         self.diffuser_standoff_pos = Cylinder(h=height,r1=radius,r2=radius)
         self.diffuser_standoff_neg = Cylinder(h=height,r1=radius,r2=radius)
+
+    def add_led_cable_hole(self):
+        hole_size_x, hole_size_y = self.params['led_cable_hole_size']
+        hole_pos_x, hole_pos_y = self.params['led_cable_hole_pos']
+        hole = {
+                'panel'     : 'bottom',
+                'type'      : 'square',
+                'location'  : (hole_pos_x, hole_pos_y),
+                'size'      : (hole_size_x, hole_size_y),
+                }
+        self.params['hole_list'].append(hole)
 
 
 
