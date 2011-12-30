@@ -59,14 +59,14 @@ enclosure.make()
 
 part_assembly = enclosure.get_assembly(
         show_top=False,
-        show_bottom=False, 
+        show_bottom=True, 
         show_front=False,
         show_back=False,
         show_left=False,
         show_right=False,
         show_standoffs=True,
         show_capillary=True,
-        show_sensor=True,
+        show_sensor=False,
         show_diffuser=True,
         show_led_pcb=True,
         show_guide_plates=True,
@@ -74,6 +74,7 @@ part_assembly = enclosure.get_assembly(
         )
 
 
+#print enclosure.standoff_xy_pos
 box_projection = enclosure.get_box_projection()
 diffuser_projection = enclosure.get_diffuser_projection()
 top_guide_projection = enclosure.get_guide_top_projection()

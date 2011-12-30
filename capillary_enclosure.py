@@ -300,31 +300,31 @@ class Capillary_Enclosure(Basic_Enclosure):
 
         self.params['hole_list'].extend(hole_list)
 
-    def add_led_cable_hole(self):
-        hole_list = []
-        hole_width = self.params['led_cable_hole_width']
-        x,y,z = self.params['inner_dimensions']
+    #def add_led_cable_hole(self):
+    #    hole_list = []
+    #    hole_width = self.params['led_cable_hole_width']
+    #    x,y,z = self.params['inner_dimensions']
 
-        x_pos = 0
-        y_pos = 0.5*z - 0.5*hole_width 
-        hole = {
-                'panel'    : 'front',
-                'type'     : 'round',
-                'location' : (x_pos,y_pos),
-                'size'     : hole_width,
-                }
-        hole_list.append(hole)
+    #    x_pos = 0
+    #    y_pos = 0.5*z - 0.5*hole_width 
+    #    hole = {
+    #            'panel'    : 'front',
+    #            'type'     : 'round',
+    #            'location' : (x_pos,y_pos),
+    #            'size'     : hole_width,
+    #            }
+    #    hole_list.append(hole)
 
-        x_pos = 0
-        y_pos = 0.5*z
-        hole = {
-                'panel'    : 'front', 
-                'type'     : 'square', 
-                'location' : (x_pos, y_pos), 
-                'size'     : (hole_width, hole_width),
-                }
-        hole_list.append(hole)
-        self.params['hole_list'].extend(hole_list)
+    #    x_pos = 0
+    #    y_pos = 0.5*z
+    #    hole = {
+    #            'panel'    : 'front', 
+    #            'type'     : 'square', 
+    #            'location' : (x_pos, y_pos), 
+    #            'size'     : (hole_width, hole_width),
+    #            }
+    #    hole_list.append(hole)
+    #    self.params['hole_list'].extend(hole_list)
 
     def make_rubber_band_notch(self):
         hole_list = []
@@ -473,6 +473,7 @@ class Capillary_Enclosure(Basic_Enclosure):
     def make_led_pcb(self):
         led_x, led_y, led_z = self.params['led_pcb_dimensions']
         hole_list = self.get_led_holes(hole_type='through')
+        #print hole_list
         self.led_pcb = plate_w_holes(led_x, led_y, led_z, holes=hole_list)
 
     def make_diffuser(self):
@@ -518,6 +519,7 @@ class Capillary_Enclosure(Basic_Enclosure):
     def add_led_cable_hole(self):
         hole_size_x, hole_size_y = self.params['led_cable_hole_size']
         hole_pos_x, hole_pos_y = self.params['led_cable_hole_pos']
+        #print hole_pos_x, hole_pos_y
         hole = {
                 'panel'     : 'bottom',
                 'type'      : 'square',
