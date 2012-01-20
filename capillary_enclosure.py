@@ -21,6 +21,8 @@ class Capillary_Enclosure(Basic_Enclosure):
         self.make_led_pcb()
         self.make_diffuser()
         self.make_led_standoffs()
+        self.make_capillary_clamp_thru_holes()
+        self.make_capillary_clamp()
 
     def get_assembly(self,**kwargs):
         """
@@ -39,6 +41,10 @@ class Capillary_Enclosure(Basic_Enclosure):
         except KeyError:
             show_guide_plates = True
         try:
+            show_guide_top = kwargs['show_guide_top']
+        except KeyError:
+            show_guide_top = True
+        try:
             show_led_pcb = kwargs['show_led_pcb']
         except KeyError:
             show_led_pcb = True
@@ -54,6 +60,10 @@ class Capillary_Enclosure(Basic_Enclosure):
             explode = kwargs['explode']
         except KeyError:
             explode = (0,0,0)
+        try:
+            show_clamp = kwargs['show_clamp']
+        except KeyError:
+            show_clamp = True
 
         explode_x, explode_y, explode_z = explode
 
@@ -91,7 +101,10 @@ class Capillary_Enclosure(Basic_Enclosure):
         z_shift = -0.5*z + 1.5*guide_z 
         guide_plate_top = Translate(self.guide_plate_top,v=[0,y_shift,z_shift])
         if show_guide_plates:
-           parts_list.extend([guide_plate_pos,guide_plate_neg,guide_plate_top])
+           parts_list.extend([guide_plate_pos,guide_plate_neg])
+        if show_guide_top:
+           parts_list.extend([guide_plate_top])
+
 
         # Add led pcb
         pcb_x, pcb_y, pcb_z = self.params['led_pcb_dimensions']
@@ -120,6 +133,15 @@ class Capillary_Enclosure(Basic_Enclosure):
             if show_diffuser_standoffs:
                 parts_list.append(standoff)
 
+        # Add capillary clamp
+        bottom_x_overhang = self.params['bottom_x_overhang']
+        clamp_x, clamp_y, clamp_z = self.clamp_size
+        x_shift = 0.5*self.bottom_x - 0.5*bottom_x_overhang
+        z_shift = -0.5*z + 0.5*wall_thickness + cap_hole_diam
+        capillary_clamp = Translate(self.capillary_clamp,v=(x_shift,0,z_shift))
+        if show_clamp:
+            parts_list.append(capillary_clamp)
+
         return parts_list
 
 
@@ -128,6 +150,14 @@ class Capillary_Enclosure(Basic_Enclosure):
         Get 2D projected layout of parts for laser cutting.
         """
         parts_list = super(Capillary_Enclosure,self).get_projection(show_ref_cube,spacing_factor)
+
+        # Add capillary clamp
+        thickness = self.params['wall_thickness']
+        clamp_x, clamp_y, clamp_z = self.clamp_size
+        x_shift = 0.5*self.bottom_x + 0.5*clamp_x + spacing_factor*thickness
+        y_shift = 0.5*self.bottom_y + 0.5*clamp_y + spacing_factor*thickness
+        clamp = Translate(self.capillary_clamp,v=(x_shift,y_shift,0))
+        parts_list.append(Projection(clamp))
         return parts_list
 
 
@@ -246,30 +276,6 @@ class Capillary_Enclosure(Basic_Enclosure):
         hole_list.append(hole)
         self.params['hole_list'].extend(hole_list)
 
-    def add_capillary_clamp_holes(self):
-        """
-        Add holes for clamping capillary in place
-        """
-        hole_list = []
-        hole_diam = self.params['capillary_clamp_hole_diam']
-        sensor_hole_space = self.params['sensor_mount_hole_space']
-        clamp_hole_space = self.params['capillary_clamp_hole_space']
-        self.capillary_clamp_holes_xy = []
-        for i in (-1,1):
-            for j in (-1,1):
-                x_pos = 0.5*i*sensor_hole_space
-                y_pos = 0.5*j*clamp_hole_space
-                self.capillary_clamp_holes_xy.append((x_pos,y_pos))
-                hole = {
-                        'panel'    : 'bottom',
-                        'type'     : 'round',
-                        'location' : (x_pos,y_pos),
-                        'size'     : hole_diam,
-                        }
-                hole_list.append(hole)
-        self.params['hole_list'].extend(hole_list)
-
-
     def add_sensor_cable_hole(self):
         """
         Add cable hole for sensor.
@@ -299,90 +305,6 @@ class Capillary_Enclosure(Basic_Enclosure):
         hole_list.append(hole)
 
         self.params['hole_list'].extend(hole_list)
-
-    #def add_led_cable_hole(self):
-    #    hole_list = []
-    #    hole_width = self.params['led_cable_hole_width']
-    #    x,y,z = self.params['inner_dimensions']
-
-    #    x_pos = 0
-    #    y_pos = 0.5*z - 0.5*hole_width 
-    #    hole = {
-    #            'panel'    : 'front',
-    #            'type'     : 'round',
-    #            'location' : (x_pos,y_pos),
-    #            'size'     : hole_width,
-    #            }
-    #    hole_list.append(hole)
-
-    #    x_pos = 0
-    #    y_pos = 0.5*z
-    #    hole = {
-    #            'panel'    : 'front', 
-    #            'type'     : 'square', 
-    #            'location' : (x_pos, y_pos), 
-    #            'size'     : (hole_width, hole_width),
-    #            }
-    #    hole_list.append(hole)
-    #    self.params['hole_list'].extend(hole_list)
-
-    def make_rubber_band_notch(self):
-        hole_list = []
-        hole_width = self.params['rubber_band_notch_width']
-        sensor_space = self.params['sensor_mount_hole_space']
-        x,y,z = self.params['inner_dimensions']
-
-        # Create holes for bottom panel
-        for i in (-1,1):
-            for j in (-1,1):
-
-                # Round portion of hole
-                x_pos = i*0.5*sensor_space
-                y_pos = j*(0.5*self.bottom_y - 0.5*hole_width)
-                hole = {
-                        'panel'    : 'bottom',
-                        'type'     : 'round', 
-                        'location' : (x_pos, y_pos),
-                        'size'     : hole_width,
-                        }
-                hole_list.append(hole)
-
-                # Rectangular portion of hole
-                y_pos = j*0.5*self.bottom_y
-                hole = {
-                        'panel'    : 'bottom',
-                        'type'     : 'square', 
-                        'location' : (x_pos, y_pos), 
-                        'size'     : (hole_width, hole_width),
-                        }
-                hole_list.append(hole)
-
-        #Create holes for front and back panels
-        panel_list = ('front' , 'back')
-        for panel in panel_list:
-            for i in (-1,1): 
-                # Round portion of hole
-                x_pos = i*0.5*sensor_space
-                y_pos = -(0.5*z - 0.5*hole_width)
-                hole = {
-                        'panel'    : panel,
-                        'type'     : 'round',
-                        'location' : (x_pos, y_pos),
-                        'size'     : hole_width,
-                        }
-                hole_list.append(hole)
-
-                # Square portion of hole
-                y_pos = -0.5*z
-                hole = {
-                        'panel'    : panel,
-                        'type'     : 'square', 
-                        'location' : (x_pos, y_pos),
-                        'size'     : (hole_width, hole_width),
-                        }
-                hole_list.append(hole)
-
-        self.add_holes(hole_list)
 
     def make_sensor(self):
         sensor_x, sensor_y, sensor_z = self.params['sensor_dimensions']
@@ -527,6 +449,47 @@ class Capillary_Enclosure(Basic_Enclosure):
                 'size'      : (hole_size_x, hole_size_y),
                 }
         self.params['hole_list'].append(hole)
+
+    def make_capillary_clamp_thru_holes(self):
+        inner_x, inner_y, inner_z = self.params['inner_dimensions']
+        wall_thickness = self.params['wall_thickness']
+        bottom_x_overhang = self.params['bottom_x_overhang']
+        hole_diam = self.params['capillary_clamp_thru_hole_diam']
+        hole_offset = self.params['capillary_clamp_hole_offset']
+
+        hole_list = []
+        for i in (-1,1):
+            x_pos = i*(0.5*self.bottom_x - 0.5*bottom_x_overhang)
+            y_pos = hole_offset 
+            hole = {
+                    'panel'    : 'bottom',
+                    'type'     : 'round',
+                    'location' : (x_pos, y_pos),
+                    'size'     : hole_diam,
+                    }
+            hole_list.append(hole)
+
+        self.params['hole_list'].extend(hole_list)
+        self.add_holes(hole_list)
+
+    def make_capillary_clamp(self):
+        bottom_x_overhang = self.params['bottom_x_overhang']
+        wall_thickness = self.params['wall_thickness']
+        clamp_length = self.params['capillary_clamp_length']
+        clamp_tolerance = self.params['capillary_clamp_tolerance']
+        clamp_radius = self.params['capillary_clamp_radius']
+        hole_offset = self.params['capillary_clamp_hole_offset']
+        hole_diam = self.params['capillary_clamp_tap_hole_diam']
+
+        clamp_x = bottom_x_overhang - 2*clamp_tolerance
+        clamp_y = clamp_length
+        clamp_z = wall_thickness 
+        self.clamp_size = clamp_x, clamp_y, clamp_z
+
+        hole_list = [(0,hole_offset,hole_diam)]
+
+        clamp = plate_w_holes(clamp_x,clamp_y,clamp_z,hole_list,radius=clamp_radius)
+        self.capillary_clamp = clamp
 
 
 
