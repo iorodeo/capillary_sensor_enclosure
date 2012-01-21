@@ -1,0 +1,7 @@
+Filename                          Qty             Material
+-------------------------------------------------------------------------------
+arrayed_bottom_projection.dxf     1x           3mm black acrylic
+arrayed_box_projection.dxf        5x           3mm black acrylic
+diffuser_projection.dxf           5x           1.5mm white and clear acrylic
+side_guide_projection.dxf         5x           1.5mm black acrylic
+top_guide_projection.dxf          5x           1.5mm clear acrylic

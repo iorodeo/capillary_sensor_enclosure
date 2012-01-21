@@ -1,10 +1,13 @@
 """
 Creates an enclosure
 """
+import os.path
+import subprocess
 from py2scad import *
 from capillary_enclosure import Capillary_Enclosure
 
 INCH2MM = 25.4
+create_dxf=True
 
 # Inside dimensions
 x,y,z = 61.4, 45.0, 0.75*INCH2MM 
@@ -93,28 +96,47 @@ if __name__ == '__main__':
     top_guide_projection = enclosure.get_guide_top_projection()
     side_guide_projection = enclosure.get_guide_side_projection()
     
+    # Write assembly scad file
     prog_assembly = SCAD_Prog()
     prog_assembly.fn = 50
     prog_assembly.add(part_assembly)
     prog_assembly.write('enclosure_assembly.scad')
     
+    # Write scad file for projections
+    scad_projection_files = []
+
+    filename = 'box_projection.scad'
     prog_box_projection = SCAD_Prog()
     prog_box_projection.fn = 50
     prog_box_projection.add(box_projection)
-    prog_box_projection.write('box_projection.scad')
+    prog_box_projection.write(filename)
+    scad_projection_files.append(filename)
     
+    filename = 'diffuser_projection.scad'
     prog_diffuser_projection = SCAD_Prog()
     prog_diffuser_projection.fn = 50
     prog_diffuser_projection.add(diffuser_projection)
-    prog_diffuser_projection.write('diffuser_projection.scad')
+    prog_diffuser_projection.write(filename)
+    scad_projection_files.append(filename)
     
+    filename = 'top_guide_projection.scad'
     prog_top_guide_projection = SCAD_Prog()
     prog_top_guide_projection.fn = 50
     prog_top_guide_projection.add(top_guide_projection)
-    prog_top_guide_projection.write('top_guide_projection.scad')
+    prog_top_guide_projection.write(filename)
+    scad_projection_files.append(filename)
     
+    filename = 'side_guide_projection.scad'
     prog_side_guide_projection = SCAD_Prog()
     prog_side_guide_projection.fn = 50
     prog_side_guide_projection.add(side_guide_projection)
-    prog_side_guide_projection.write('side_guide_projection.scad')
+    prog_side_guide_projection.write(filename)
+    scad_projection_files.append(filename)
 
+    # Create dxf files
+    if create_dxf:
+        for scad_name in scad_projection_files:
+            base_name, ext = os.path.splitext(scad_name)
+            dxf_name = '{0}.dxf'.format(base_name)
+            print '{0} -> {1}'.format(scad_name, dxf_name)
+            subprocess.call(['openscad', '-x', dxf_name, scad_name])
