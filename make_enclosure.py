@@ -34,11 +34,11 @@ params = {
         #'capillary_hole_size'              : (1.1,1.1,0.1),  
         #'capillary_hole_offset'            : 0.25,
         'capillary_hole_size'              : (1.4,1.4,0.2),  
-        'capillary_hole_offset'            : 0.75,
+        'capillary_hole_offset'            : 0.05*INCH2MM,
         'capillary_length'                 : 5*INCH2MM,
         'capillary_clamp_thru_hole_diam'   : 0.12*INCH2MM,
         'capillary_clamp_tap_hole_diam'    : 0.089*INCH2MM,
-        'capillary_clamp_hole_offset'      : -3.0,
+        'capillary_clamp_hole_offset'      : -2.5,
         'capillary_clamp_length'           : 18.0,
         'capillary_clamp_tolerance'        : 0.25,
         'capillary_clamp_radius'           : 1.5,
@@ -61,7 +61,7 @@ params = {
         'guide_plate_dimensions'           : (x-0.2, 0.5*INCH2MM, 0.0625*INCH2MM),
         'guide_thru_hole_diam'             : 0.0890*INCH2MM,
         'guide_tap_hole_diam'              : 0.0641*INCH2MM,
-        'guide_hole_offset'                : 0.15*INCH2MM,
+        'guide_hole_offset'                : 0.11*INCH2MM,
         }
 
 # -----------------------------------------------------------------------------
@@ -71,8 +71,8 @@ if __name__ == '__main__':
     enclosure.make()
     
     part_assembly = enclosure.get_assembly(
-            show_top=False,
-            show_bottom=False, 
+            show_top=True,
+            show_bottom=True, 
             show_front=True,
             show_back=True,
             show_left=True,
@@ -80,15 +80,14 @@ if __name__ == '__main__':
             show_standoffs=True,
             show_capillary=True,
             show_sensor=True,
-            show_diffuser=False,
-            show_diffuser_standoffs=False,
-            show_led_pcb=False,
+            show_diffuser=True,
+            show_diffuser_standoffs=True,
+            show_led_pcb=True,
             show_guide_plates=True,
-            show_guide_top=False,
+            show_guide_top=True,
             show_clamp=True,
             explode=(0,0,0),
             )
-    
     
     #print enclosure.standoff_xy_pos
     box_projection = enclosure.get_box_projection()

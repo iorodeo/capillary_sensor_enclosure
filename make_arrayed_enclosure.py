@@ -19,7 +19,7 @@ if __name__ == '__main__':
     enclosure.make()
 
     # Display size of bottom plate.
-    #print [x/INCH2MM for x in enclosure.array_bottom_size]
+    print [x/INCH2MM for x in enclosure.array_bottom_size]
 
     part_assembly = enclosure.get_assembly(
             show_top=True,

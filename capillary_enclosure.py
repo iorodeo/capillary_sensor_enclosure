@@ -265,8 +265,10 @@ class Capillary_Enclosure(Basic_Enclosure):
         sensor_width = self.params['sensor_width']
         sensor_length = self.params['sensor_length']
         hole_offset = self.params['sensor_hole_offset']
-        x_pos = 0;
-        y_pos = -hole_offset;
+        x_pos = 0
+        # WBD
+        #y_pos = -hole_offset;
+        y_pos = 0
         hole = {
                     'panel'    : 'bottom', 
                     'type'     : 'square', 
@@ -322,7 +324,9 @@ class Capillary_Enclosure(Basic_Enclosure):
 
         # Create sensor
         sensor = plate_w_holes(sensor_x, sensor_y, sensor_z, hole_list)
-        self.sensor = Translate(sensor,v=(0,-hole_offset,0))
+        # WBD
+        #self.sensor = Translate(sensor,v=(0,-hole_offset,0))
+        self.sensor = Translate(sensor,v=(0,0,0))
 
     def make_capillary(self):
         diameter = self.params['capillary_diam']
@@ -357,12 +361,13 @@ class Capillary_Enclosure(Basic_Enclosure):
 
     def add_guide_tap_holes(self):
         hole_tuples = self.get_guide_plate_holes(hole_type='tap')
+        hole_offset = self.params['capillary_hole_offset']
         hole_list = []
         for x,y,diam in hole_tuples:
             hole = {
                     'panel'    : 'bottom',
                     'type'     : 'round',
-                    'location' : (x,y),
+                    'location' : (x,y+hole_offset),
                     'size'     : diam,
                     }
             hole_list.append(hole)
