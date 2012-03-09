@@ -4,7 +4,7 @@ from py2scad import *
 from arrayed_enclosure import Arrayed_Enclosure
 from make_enclosure import params
 
-create_dxf = True 
+create_dxf = False 
 
 params['number_of_sensors'] = 5
 params['sensor_spacing'] = INCH2MM*2.0

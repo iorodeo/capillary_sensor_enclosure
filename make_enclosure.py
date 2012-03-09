@@ -7,7 +7,7 @@ from py2scad import *
 from capillary_enclosure import Capillary_Enclosure
 
 INCH2MM = 25.4
-create_dxf=True
+create_dxf=False
 
 # Inside dimensions
 x,y,z = 61.4, 45.0, 0.75*INCH2MM 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     enclosure.make()
     
     part_assembly = enclosure.get_assembly(
-            show_top=True,
+            show_top=False,
             show_bottom=True, 
             show_front=True,
             show_back=True,
@@ -80,9 +80,9 @@ if __name__ == '__main__':
             show_standoffs=True,
             show_capillary=True,
             show_sensor=True,
-            show_diffuser=True,
-            show_diffuser_standoffs=True,
-            show_led_pcb=True,
+            show_diffuser=False,
+            show_diffuser_standoffs=False,
+            show_led_pcb=False,
             show_guide_plates=True,
             show_guide_top=True,
             show_clamp=True,
